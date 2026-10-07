@@ -13,7 +13,7 @@
 
 Bettbox：Better Experience, Out of the box - 優れた体験を、すぐに使える。
 
-[![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+[![Latest Release](https://img.shields.io/github/v/release/AirportR/Cattbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/AirportR/Cattbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
 
 <p align="center">
   <img src="../snapshots/home.png" alt="Bettbox" />
@@ -51,7 +51,7 @@ Bettbox：Better Experience, Out of the box - 優れた体験を、すぐに使�
 
 ## 🛠️ インストールとダウンロード
 
-ご利用のプラットフォームおよびシステムに適した最新のインストールパッケージを **[[Releases]](https://github.com/appshubcc/Bettbox/releases)** ページからダウンロードしてください。
+ご利用のプラットフォームおよびシステムに適した最新のインストールパッケージを **[[Releases]](https://github.com/AirportR/Cattbox/releases)** ページからダウンロードしてください。
 
 
 * **全デスクトッププラットフォーム**: 
@@ -137,7 +137,7 @@ Windows の例：
 
 **[FlClash GUI](https://github.com/chen08209/FlClash)** 〢 **[Mihomo Core](https://github.com/MetaCubeX/mihomo)**
 
-すべての [コントリビューター](https://github.com/appshubcc/Bettbox/graphs/contributors) および利用・参考にしたオープンソースプロジェクトに感謝いたします：
+すべての [コントリビューター](https://github.com/AirportR/Cattbox/graphs/contributors) および利用・参考にしたオープンソースプロジェクトに感謝いたします：
 
 [Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 

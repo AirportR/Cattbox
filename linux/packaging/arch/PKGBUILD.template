@@ -3,7 +3,7 @@ pkgver=1.19.4
 pkgrel=1
 pkgdesc="基于 Mihomo（Clash.Meta）内核的多平台代理客户端"
 arch=('x86_64' 'aarch64')
-url="https://github.com/appshubcc/Bettbox"
+url="https://github.com/AirportR/Cattbox"
 license=('GPL-3.0-or-later')
 depends=(
   'gtk3'
@@ -14,8 +14,8 @@ depends=(
 install=bettbox.install
 options=('!strip' '!debug')
 source=("bettbox.install" "restart-bettbox.hook")
-source_x86_64=("https://github.com/appshubcc/Bettbox/releases/download/v\${pkgver}/Bettbox-\${pkgver}-linux-amd64.deb")
-source_aarch64=("https://github.com/appshubcc/Bettbox/releases/download/v\${pkgver}/Bettbox-\${pkgver}-linux-arm64.deb")
+source_x86_64=("https://github.com/AirportR/Cattbox/releases/download/v\${pkgver}/Bettbox-\${pkgver}-linux-amd64.deb")
+source_aarch64=("https://github.com/AirportR/Cattbox/releases/download/v\${pkgver}/Bettbox-\${pkgver}-linux-arm64.deb")
 
 package() {
   bsdtar -xf data.tar.zst -C "\${srcdir}"

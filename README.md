@@ -14,7 +14,7 @@
 Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱可用
 
 
-[![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+[![Latest Release](https://img.shields.io/github/v/release/AirportR/Cattbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/AirportR/Cattbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
 
 <p align="center">
   <img src="snapshots/home.png" alt="Bettbox" />
@@ -65,7 +65,7 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
 ---
 ## 🛠️ 安装与下载
 
-请前往 **[[Releases]](https://github.com/appshubcc/Bettbox/releases)** 页面下载最新适合您平台和系统的安装包
+请前往 **[[Releases]](https://github.com/AirportR/Cattbox/releases)** 页面下载最新适合您平台和系统的安装包
 
 
 * **全平台桌面端**: 
@@ -141,7 +141,7 @@ const Compatible_With_Bettbox = {
 
 ### ☕ 赞助支持
 
-**如果您觉得这个项目对您有所帮助，可通过以下方式赞助开发或使用[推荐链接](https://github.com/appshubcc/Bettbox#%EF%B8%8F-%E6%8E%A8%E8%8D%90%E6%9C%8D%E5%8A%A1)：**
+**如果您觉得这个项目对您有所帮助，可通过以下方式赞助开发或使用[推荐链接](https://github.com/AirportR/Cattbox#%EF%B8%8F-%E6%8E%A8%E8%8D%90%E6%9C%8D%E5%8A%A1)：**
 
 * TRON (TRC-20)：   <code>TCkTtZfF2WrciZLaJj3e1aqrh3zdTnCkDa</code>
 * Bitcoin： <code>bc1qu950cl6035qvllmzk6cfw3l30j2lg3cq9n6g6h</code>
@@ -162,7 +162,7 @@ const Compatible_With_Bettbox = {
 
 **[FlClash GUI](https://github.com/chen08209/FlClash)** 〢 **[Mihomo Core](https://github.com/MetaCubeX/mihomo)**
 
-其他为本项目添砖加瓦的 [Contributors](https://github.com/appshubcc/Bettbox/graphs/contributors) 以及相关开源项目使用或参考
+其他为本项目添砖加瓦的 [Contributors](https://github.com/AirportR/Cattbox/graphs/contributors) 以及相关开源项目使用或参考
 
 [Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 
