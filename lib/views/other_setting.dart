@@ -348,32 +348,6 @@ class LoopbackProtectionItem extends ConsumerWidget {
       subtitle: Text(appLocalizations.loopbackProtectionDesc),
       delegate: SwitchDelegate(
         value: loopbackProtection,
-        onChanged: (bool value) {
-          ref
-              .read(vpnSettingProvider.notifier)
-              .updateState(
-                (state) => state.copyWith(loopbackProtection: value),
-              );
-        },
-      ),
-    );
-  }
-}
-
-class LoopbackProtectionItem extends ConsumerWidget {
-  const LoopbackProtectionItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final loopbackProtection = ref.watch(
-      vpnSettingProvider.select((state) => state.loopbackProtection),
-    );
-
-    return ListItem.switchItem(
-      title: Text(appLocalizations.loopbackProtection),
-      subtitle: Text(appLocalizations.loopbackProtectionDesc),
-      delegate: SwitchDelegate(
-        value: loopbackProtection,
         onChanged: (bool value) async {
           ref
               .read(vpnSettingProvider.notifier)
