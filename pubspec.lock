@@ -655,8 +655,8 @@ packages:
     dependency: "direct overridden"
     description:
       path: "packages/hotkey_manager_linux"
-      ref: fix-build-failure
-      resolved-ref: "1b31e3ca4ab017ee72f54a7065b2073a88403d61"
+      ref: main
+      resolved-ref: ddbb7bf7f6db9d40bcd0cd1c98d32f631b5ba2ed
       url: "https://github.com/gepbird/hotkey_manager.git"
     source: git
     version: "0.2.0"

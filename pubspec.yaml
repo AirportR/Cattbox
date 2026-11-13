@@ -76,7 +76,7 @@ dependency_overrides:
     git:
       url: https://github.com/gepbird/hotkey_manager.git
       path: packages/hotkey_manager_linux
-      ref: fix-build-failure
+      ref: main
 dev_dependencies:
   flutter_test:
     sdk: flutter
