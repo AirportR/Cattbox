@@ -6,6 +6,7 @@ import (
 	"unsafe"
 
 	cProxy "github.com/metacubex/mihomo/constant"
+	cp "github.com/metacubex/mihomo/constant/provider"
 	"github.com/metacubex/mihomo/tunnel"
 )
 
@@ -115,6 +116,31 @@ func clearSuspendedHealthChecks() {
 		*entry.target = entry.orig
 	}
 	suspendedEntries = nil
+}
+
+func closeIdleOutbounds(proxies map[string]cProxy.Proxy, providers map[string]cp.ProxyProvider) {
+	for _, p := range proxies {
+		closeIdleOutbound(p)
+	}
+	for _, pr := range providers {
+		for _, p := range pr.Proxies() {
+			closeIdleOutbound(p)
+		}
+	}
+}
+
+// idleCloser mirrors the CloseIdle hook the upstream core expects from its
+// vendored mihomo tree. Declaring it locally keeps the interface assertion
+// working without requiring the submodule to export the same type, so the
+// fork can stay on a mihomo revision that does not have the hook yet.
+type idleCloser interface {
+	CloseIdle()
+}
+
+func closeIdleOutbound(p cProxy.Proxy) {
+	if closer, ok := p.Adapter().(idleCloser); ok {
+		closer.CloseIdle()
+	}
 }
 
 func pauseSingleWireGuard(p cProxy.Proxy) {

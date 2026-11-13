@@ -12,18 +12,22 @@ class AppPath {
   Completer<Directory> downloadDir = Completer();
   Completer<Directory> tempDir = Completer();
   late String appDirPath;
+  late final bool isPortable;
 
   String? _resolvedDataDirPath;
 
   AppPath._internal() {
     appDirPath = join(dirname(Platform.resolvedExecutable));
     final portableDir = Directory(join(appDirPath, 'portable'));
-    if (system.isWindows && portableDir.existsSync()) {
+    isPortable = system.isWindows && portableDir.existsSync();
+    if (isPortable) {
       _resolvedDataDirPath = portableDir.path;
       dataDir.complete(portableDir);
-      final portableTempDir = Directory(join(portableDir.path, 'temp'));
-      if (!portableTempDir.existsSync()) {
+      var portableTempDir = Directory(join(portableDir.path, 'temp'));
+      try {
         portableTempDir.createSync(recursive: true);
+      } catch (_) {
+        portableTempDir = Directory.systemTemp;
       }
       tempDir.complete(portableTempDir);
     } else {
@@ -47,9 +51,6 @@ class AppPath {
       downloadDir.complete(value);
     });
   }
-
-  bool get isPortable =>
-      system.isWindows && Directory(join(appDirPath, 'portable')).existsSync();
 
   factory AppPath() {
     _instance ??= AppPath._internal();
@@ -78,7 +79,9 @@ class AppPath {
         : join(Platform.environment['HOME'] ?? '', '.local', 'share');
     return join(
       baseDir,
-      AppIdentity.isDev ? '${AppIdentity.packageId}.dev' : AppIdentity.packageId,
+      AppIdentity.isDev
+          ? '${AppIdentity.packageId}.dev'
+          : AppIdentity.packageId,
     );
   }
 
@@ -148,7 +151,7 @@ class AppPath {
       Process.runSync('chmod', ['0755', external.path]);
       stampFile.writeAsStringSync(currentStamp);
     } catch (e) {
-      commonPrint.log('Failed to sync AppImage core: $e');
+      commonPrint.warn('Failed to sync AppImage core: $e');
     }
   }
 
@@ -194,10 +197,6 @@ class AppPath {
     return directory.path;
   }
 
-  Future<String> get configFilePath async {
-    return join(await homeDirPath, 'config.yaml');
-  }
-
   Future<String> get lockFilePath async {
     final directory = await dataDir.future;
     return join(directory.path, '${AppIdentity.dataDirName}.lock');
@@ -223,9 +222,19 @@ class AppPath {
     return join(directory.path, 'config.json');
   }
 
-  Future<String> get ipCacheFilePath async {
-    final tempDirectory = await tempPath;
-    return join(tempDirectory, 'ip_cache.json');
+  Future<String> get speedTestPath async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'speed_test.json');
+  }
+
+  Future<String> get toolHistoryPath async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'toolbox_history.json');
+  }
+
+  Future<String> get iconSetsPath async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'icon_sets.json');
   }
 
   Future<String> get helperAuthKeyPath async {
@@ -241,6 +250,11 @@ class AppPath {
   Future<String> getProfilePath(String id) async {
     final directory = await profilesPath;
     return join(directory, '$id.yaml');
+  }
+
+  Future<String> getScriptPath(String id) async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'scripts', '${basename(id)}.js');
   }
 
   Future<String> getProvidersDirPath(String id) async {
@@ -259,6 +273,12 @@ class AppPath {
 
   Future<String> get tempPath async {
     final directory = await tempDir.future;
+    return directory.path;
+  }
+
+  Future<String> get relayPath async {
+    final directory = Directory(join(await homeDirPath, 'relay'));
+    await directory.create(recursive: true);
     return directory.path;
   }
 

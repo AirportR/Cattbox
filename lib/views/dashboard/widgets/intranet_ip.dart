@@ -1,24 +1,164 @@
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/app.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/state.dart';
-import 'package:bett_box/views/config/general.dart';
 import 'package:bett_box/widgets/widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'tile.dart';
+
 class IntranetIP extends StatelessWidget {
-  const IntranetIP({super.key});
+  final DashboardTileSize? size;
+
+  const IntranetIP({super.key, this.size});
 
   void _showMoreIpInfoDialog(BuildContext context) {
-    globalState.showCommonDialog(child: const _IntranetIpInfoDialog());
+    globalState.showAdaptiveSheet(child: const _IntranetIpInfoDialog());
+  }
+
+  Widget _buildItem(BuildContext context, String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.labelSmall?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        Text(
+          value.isEmpty ? '—' : value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodyMedium?.toLight,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTile(BuildContext context, DashboardTileSize size) {
+    final isTall = size == DashboardTileSize.tall;
+    return Consumer(
+      builder: (_, ref, _) {
+        final info = ref.watch(localNetworkProvider);
+        final ip = info == null
+            ? '…'
+            : info.ip.isEmpty
+            ? appLocalizations.noNetwork
+            : info.ip;
+        final local = [
+          appLocalizations.natLocalIp,
+          if (info?.type.isNotEmpty ?? false) info?.type,
+        ].join(' · ');
+        final gateway = info?.gateway ?? '';
+        return DashboardTileCard(
+          size: size,
+          info: Info(
+            label: appLocalizations.intranetIP,
+            iconData: Icons.devices,
+          ),
+          mark: DashboardDecor.icon(context, Icons.devices, 80),
+          markBottom: isTall,
+          markAngle: isTall ? 0.3 : -0.3,
+          onPressed: () => _showMoreIpInfoDialog(context),
+          child: isTall
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 12, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final item in [
+                        _buildItem(context, local, ip),
+                        _buildItem(
+                          context,
+                          appLocalizations.defaultGateway,
+                          gateway,
+                        ),
+                        _buildItem(
+                          context,
+                          appLocalizations.systemDns,
+                          info?.dns.firstOrNull ?? '',
+                        ),
+                      ])
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: item,
+                        ),
+                    ],
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 48, 10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          if (info?.type.isNotEmpty ?? false) ...[
+                            Text(
+                              info?.type ?? '',
+                              maxLines: 1,
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Text(
+                                ip,
+                                maxLines: 1,
+                                style: context.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                  fontFeatures: const [
+                                    FontFeature.tabularFigures(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        [
+                          if (gateway.isNotEmpty)
+                            '${appLocalizations.defaultGateway} $gateway',
+                          if (info?.dns.firstOrNull case final dns?)
+                            '${appLocalizations.systemDns} $dns',
+                        ].join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = this.size;
+    if (size != null) return _buildTile(context, size);
     return SizedBox(
-      height: getWidgetHeight(1),
+      height: getWidgetHeight(context, 1),
       child: CommonCard(
         info: Info(label: appLocalizations.intranetIP, iconData: Icons.devices),
         onPressed: () => _showMoreIpInfoDialog(context),
@@ -32,7 +172,9 @@ class IntranetIP extends StatelessWidget {
                 height: globalState.measure.bodyMediumHeight + 2,
                 child: Consumer(
                   builder: (_, ref, _) {
-                    final localIp = ref.watch(localIpProvider);
+                    final localIp = ref.watch(
+                      localNetworkProvider.select((state) => state?.ip),
+                    );
                     return FadeThroughBox(
                       child: localIp != null
                           ? TooltipText(
@@ -67,11 +209,6 @@ class IntranetIP extends StatelessWidget {
   }
 }
 
-String _cachedNetworkType = '';
-List<String> _cachedGateways = [];
-List<String> _cachedSystemDns = [];
-bool _hasNetworkCache = false;
-
 class _IntranetIpInfoDialog extends ConsumerStatefulWidget {
   const _IntranetIpInfoDialog();
 
@@ -81,71 +218,10 @@ class _IntranetIpInfoDialog extends ConsumerStatefulWidget {
 }
 
 class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
-  late String _networkType;
-  late List<String> _gateways;
-  late List<String> _systemDns;
-  late bool _isLoading;
-
   @override
   void initState() {
     super.initState();
-    if (_hasNetworkCache) {
-      _networkType = _cachedNetworkType;
-      _gateways = _cachedGateways;
-      _systemDns = _cachedSystemDns;
-      _isLoading = false;
-    } else {
-      _networkType = '';
-      _gateways = [];
-      _systemDns = [];
-      _isLoading = true;
-    }
-    _loadNetworkDetails();
-  }
-
-  Future<void> _loadNetworkDetails() async {
-    try {
-      final results = await Future.wait([
-        utils.getNetworkType(),
-        utils.getLocalGateways(),
-        utils.getSystemDns(),
-      ]);
-      final networkType = results[0] as String;
-      final gateways = results[1] as List<String>;
-      final systemDns = results[2] as List<String>;
-
-      _cachedNetworkType = networkType;
-      _cachedGateways = gateways;
-      _cachedSystemDns = systemDns;
-      _hasNetworkCache = true;
-
-      if (!mounted) return;
-      setState(() {
-        _networkType = networkType;
-        _gateways = gateways;
-        _systemDns = systemDns;
-        _isLoading = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _openLanSettings(BuildContext context) {
-    final targetContext = globalState.navigatorKey.currentContext ?? context;
-    Navigator.of(context, rootNavigator: true).pop();
-    showExtend(
-      targetContext,
-      builder: (_, type) => AdaptiveSheetScaffold(
-        type: type,
-        title: appLocalizations.general,
-        body: const GeneralListView(),
-      ),
-      props: const ExtendProps(blur: false, forceFull: true),
-    );
+    globalState.appController.updateLocalNetwork(silent: true);
   }
 
   Widget _buildSectionHeader(String title, {bool isFirst = false}) {
@@ -172,10 +248,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: panelTileDecoration(context),
       child: Row(
         children: [
           Container(
@@ -230,10 +303,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
   Widget _buildLanSharingTile(bool allowLan) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: panelTileDecoration(context),
       child: Row(
         children: [
           Container(
@@ -261,59 +331,12 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => _openLanSettings(context),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: allowLan
-                            ? context.colorScheme.primaryContainer
-                            : context.colorScheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: allowLan
-                            ? null
-                            : Border.all(
-                                color: context.colorScheme.outlineVariant
-                                    .withValues(alpha: 0.5),
-                              ),
-                      ),
-                      child: Text(
-                        allowLan
-                            ? appLocalizations.enabled
-                            : appLocalizations.disabled,
-                        style: context.textTheme.labelSmall?.copyWith(
-                          color: allowLan
-                              ? context.colorScheme.onPrimaryContainer
-                              : context.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 18,
-                      color: context.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.7,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          Switch(
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            value: allowLan,
+            onChanged: (value) => ref
+                .read(patchClashConfigProvider.notifier)
+                .updateState((state) => state.copyWith(allowLan: value)),
           ),
         ],
       ),
@@ -387,7 +410,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localIp = ref.watch(localIpProvider) ?? '';
+    final network = ref.watch(localNetworkProvider);
     final allowLan = ref.watch(
       patchClashConfigProvider.select((state) => state.allowLan),
     );
@@ -395,26 +418,33 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
       patchClashConfigProvider.select((state) => state.mixedPort),
     );
 
-    final displayLocalIp = localIp.isNotEmpty ? localIp : '-';
-    final primaryGateway = _gateways.isNotEmpty ? _gateways.first : '';
-    final displayGateway = primaryGateway.isNotEmpty ? primaryGateway : '-';
-    final sharedAddress = localIp.isNotEmpty ? '$localIp:$mixedPort' : '-';
-
-    final systemDnsText = _systemDns.isNotEmpty
-        ? _systemDns.join(', ')
-        : (_isLoading ? '...' : '-');
+    final placeholder = network == null ? '...' : '-';
+    final type = network?.type ?? '';
+    final interfaceName = network?.interfaceName ?? '';
+    final localIp = network?.ip ?? '';
+    final gateway = network?.gateway ?? '';
+    final networkType = [
+      type,
+      if (interfaceName.toLowerCase() != type.toLowerCase())
+        type.isEmpty ? interfaceName : '($interfaceName)',
+    ].where((e) => e.isNotEmpty).join(' ');
+    final canOpenGateway = _canOpenGateway(gateway, type);
+    final sharedAddress = '$localIp:$mixedPort';
+    final systemDnsText = network?.dns.join(', ') ?? '';
 
     return CommonDialog(
       title: appLocalizations.moreIpInfo,
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-          child: Text(appLocalizations.confirm),
-        ),
-      ],
+      actions: isInBottomSheet(context)
+          ? null
+          : [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+                child: Text(appLocalizations.confirm),
+              ),
+            ],
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -425,32 +455,32 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
               isFirst: true,
             ),
             _buildStatTile(
-              icon: _resolveNetworkIcon(_networkType),
+              icon: _resolveNetworkIcon(type),
               iconColor: context.colorScheme.primary,
               label: appLocalizations.networkType,
-              value: _networkType.isNotEmpty
-                  ? _networkType
-                  : (_isLoading ? '...' : appLocalizations.noNetwork),
+              value: networkType.isNotEmpty
+                  ? networkType
+                  : (network == null ? '...' : appLocalizations.noNetwork),
             ),
             const SizedBox(height: 8),
             _buildStatTile(
               icon: Icons.devices_rounded,
               iconColor: context.colorScheme.secondary,
               label: appLocalizations.intranetIP,
-              value: displayLocalIp,
+              value: localIp.isNotEmpty ? localIp : placeholder,
             ),
             const SizedBox(height: 8),
             _buildStatTile(
               icon: Icons.router_rounded,
               iconColor: context.colorScheme.tertiary,
               label: appLocalizations.defaultGateway,
-              value: displayGateway,
-              action: _canOpenGateway(primaryGateway, _networkType)
+              value: gateway.isNotEmpty ? gateway : placeholder,
+              action: canOpenGateway
                   ? _buildIconButton(
                       icon: Icons.open_in_new,
                       tooltip: appLocalizations.openRouterAdmin,
                       onPressed: () {
-                        globalState.openUrl('http://$primaryGateway');
+                        globalState.openUrl('http://$gateway');
                       },
                     )
                   : null,
@@ -462,7 +492,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
               label: appLocalizations.systemDns,
               value: systemDnsText,
               customValue: SelectableText(
-                systemDnsText,
+                systemDnsText.isNotEmpty ? systemDnsText : placeholder,
                 style: context.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 12.5,
@@ -472,26 +502,22 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
             ),
             _buildSectionHeader(appLocalizations.allowLan),
             _buildLanSharingTile(allowLan),
-            if (allowLan) ...[
+            if (allowLan && canOpenGateway && localIp.isNotEmpty) ...[
               const SizedBox(height: 8),
               _buildStatTile(
                 icon: Icons.cable_rounded,
                 iconColor: context.colorScheme.primary,
                 value: sharedAddress,
-                action: localIp.isNotEmpty
-                    ? _buildIconButton(
-                        icon: Icons.copy_rounded,
-                        tooltip: appLocalizations.copy,
-                        onPressed: () async {
-                          await Clipboard.setData(
-                            ClipboardData(text: sharedAddress),
-                          );
-                          if (context.mounted) {
-                            context.showNotifier(appLocalizations.copySuccess);
-                          }
-                        },
-                      )
-                    : null,
+                action: _buildIconButton(
+                  icon: Icons.copy_rounded,
+                  tooltip: appLocalizations.copy,
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: sharedAddress));
+                    if (context.mounted) {
+                      context.showNotifier(appLocalizations.copySuccess);
+                    }
+                  },
+                ),
               ),
             ],
           ],

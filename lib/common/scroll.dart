@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/widgets/scroll.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class BaseScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -35,7 +35,11 @@ class ShowBarScrollBehavior extends BaseScrollBehavior {
     Widget child,
     ScrollableDetails details,
   ) {
-    return CommonScrollBar(controller: details.controller, child: child);
+    return CommonScrollBar(
+      controller: details.controller,
+      axis: axisDirectionToAxis(details.direction),
+      child: child,
+    );
   }
 }
 

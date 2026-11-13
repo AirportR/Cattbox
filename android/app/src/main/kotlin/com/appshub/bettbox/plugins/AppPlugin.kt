@@ -26,6 +26,7 @@ import com.appshub.bettbox.R
 import com.appshub.bettbox.extensions.awaitResult
 import com.appshub.bettbox.extensions.getActionIntent
 import com.appshub.bettbox.models.Package
+import com.appshub.bettbox.widget.HomeWidgets
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -36,8 +37,13 @@ import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.ref.WeakReference
@@ -57,7 +63,9 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     private lateinit var channel: MethodChannel
     private lateinit var scope: CoroutineScope
     private var vpnCallBack: (() -> Unit)? = null
-    private val packages = mutableListOf<Package>()
+    @Volatile
+    private var packages: List<Package> = emptyList()
+    private val packagesMutex = Mutex()
     private val chinaPackageCache = ConcurrentHashMap<String, Boolean>()
 
     private val iconCacheDir by lazy {
@@ -194,10 +202,36 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         }
     }
 
+    fun invokeHomeWidget(method: String, argument: Any): Boolean {
+        if (!::channel.isInitialized) return false
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            runCatching { channel.invokeMethod(method, argument) }
+        }
+        return true
+    }
+
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
+            "updateHomeWidget" -> {
+                val data = call.arguments as? String
+                if (data != null) HomeWidgets.save(BettboxApplication.getAppContext(), data)
+                result.success(null)
+            }
+
+            "hasHomeWidgets" -> {
+                result.success(HomeWidgets.hasWidgets(BettboxApplication.getAppContext()))
+            }
+
+            "consumeHomeWidgetAction" -> {
+                result.success(HomeWidgets.consumePendingAction())
+            }
+
             "moveTaskToBack" -> {
                 activityRef?.get()?.moveTaskToBack(true)
+                result.success(true)
+            }
+            "notifyLowMemory" -> {
+                GlobalState.notifyLowMemory()
                 result.success(true)
             }
             "updateExcludeFromRecents" -> {
@@ -361,28 +395,37 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             null
         }
 
-    private suspend fun getPackages(forceRefresh: Boolean = false): List<Package> = withContext(Dispatchers.IO) {
-        if (forceRefresh) packages.clear()
-        if (packages.isNotEmpty()) return@withContext packages
-        val pm = BettboxApplication.getAppContext().packageManager ?: return@withContext emptyList()
-        val selfPackageName = BettboxApplication.getAppContext().packageName
-
-        packages.addAll(pm.getInstalledPackages(0).mapNotNull { packageInfo ->
-            val packageName = packageInfo.packageName ?: return@mapNotNull null
-            if (packageName == selfPackageName) return@mapNotNull null
-            val appInfo = packageInfo.applicationInfo ?: return@mapNotNull null
-
-            val label = runCatching { appInfo.loadLabel(pm).toString() }.getOrDefault(packageName)
-            val system = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-            val internet = runCatching {
-                pm.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
-            }.getOrDefault(false)
-            val firstInstallTime = packageInfo.firstInstallTime
-            val lastUpdateTime = packageInfo.lastUpdateTime.takeIf { it > 0 } ?: firstInstallTime
-
-            Package(packageName, label, system, internet, firstInstallTime, lastUpdateTime)
-        })
+    private suspend fun getPackages(forceRefresh: Boolean = false): List<Package> = packagesMutex.withLock {
+        if (!forceRefresh && packages.isNotEmpty()) return@withLock packages
+        packages = withContext(Dispatchers.IO) { loadPackages() }
         packages
+    }
+
+    private suspend fun loadPackages(): List<Package> = coroutineScope {
+        val pm = BettboxApplication.getAppContext().packageManager ?: return@coroutineScope emptyList()
+        val selfPackageName = BettboxApplication.getAppContext().packageName
+        val packageInfos = pm.getInstalledPackages(0)
+        val chunkSize = packageInfos.size / Runtime.getRuntime().availableProcessors() + 1
+
+        packageInfos.chunked(chunkSize).map { chunk ->
+            async {
+                chunk.mapNotNull { packageInfo ->
+                    val packageName = packageInfo.packageName ?: return@mapNotNull null
+                    if (packageName == selfPackageName) return@mapNotNull null
+                    val appInfo = packageInfo.applicationInfo ?: return@mapNotNull null
+
+                    val label = runCatching { appInfo.loadLabel(pm).toString() }.getOrDefault(packageName)
+                    val system = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                    val internet = runCatching {
+                        pm.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
+                    }.getOrDefault(false)
+                    val firstInstallTime = packageInfo.firstInstallTime
+                    val lastUpdateTime = packageInfo.lastUpdateTime.takeIf { it > 0 } ?: firstInstallTime
+
+                    Package(packageName, label, system, internet, firstInstallTime, lastUpdateTime)
+                }
+            }
+        }.awaitAll().flatten()
     }
 
     private suspend fun getPackagesToList(forceRefresh: Boolean = false): List<Map<String, Any>> =
@@ -515,6 +558,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         if (requestCode == VPN_PERMISSION_REQUEST_CODE && resultCode == FlutterActivity.RESULT_OK) {
             GlobalState.initServiceEngine()
             vpnCallBack?.invoke()
+        } else if (requestCode == VPN_PERMISSION_REQUEST_CODE) {
+            ServicePlugin.notifyVpnStartFailed()
         }
         return true
     }

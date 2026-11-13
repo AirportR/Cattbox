@@ -87,7 +87,23 @@ pub mod core {
         Lazy::new(|| Arc::new(Mutex::new(None)));
 
     pub fn start_core(start_params: StartParams) -> String {
-        if let Err(e) = validate_core_path(&start_params.path) {
+        if let Err(e) = validate_absolute_path(&start_params.path) {
+            log_message(e.clone());
+            return e;
+        }
+        if start_params.arg.parse::<u16>().is_err()
+            && validate_absolute_path(&start_params.arg).is_err()
+        {
+            let msg = "core arg is invalid".to_string();
+            log_message(msg.clone());
+            return msg;
+        }
+        if let Err(e) = start_params
+            .home_dir
+            .as_deref()
+            .ok_or_else(|| "home_dir is required".to_string())
+            .and_then(validate_absolute_path)
+        {
             log_message(e.clone());
             return e;
         }
@@ -171,6 +187,7 @@ pub mod core {
     }
 
     static WATCHER_STARTED: AtomicBool = AtomicBool::new(false);
+    const DEV_EXIT_GRACE: Duration = Duration::from_secs(5);
 
     fn start_dev_core_exit_watcher() {
         if !should_exit_service_when_core_exits() {
@@ -194,6 +211,14 @@ pub mod core {
                     log_message(format!("Core process exited: {}", status));
                     *process = None;
                     drop(process);
+                    thread::sleep(DEV_EXIT_GRACE);
+                    if PROCESS
+                        .lock()
+                        .unwrap_or_else(|e| e.into_inner())
+                        .is_some()
+                    {
+                        continue;
+                    }
                     log_message("Dev helper service exiting after core exit".to_string());
                     std::process::exit(0);
                 }
@@ -206,6 +231,10 @@ pub mod core {
                 }
             }
         });
+    }
+
+    pub fn is_dev_mode() -> bool {
+        should_exit_service_when_core_exits()
     }
 
     fn should_exit_service_when_core_exits() -> bool {
@@ -231,16 +260,16 @@ pub mod core {
             .unwrap_or(false)
     }
 
-    fn validate_core_path(path: &str) -> Result<(), String> {
+    fn validate_absolute_path(path: &str) -> Result<(), String> {
         let path = std::path::Path::new(path);
         if !path.is_absolute() {
-            return Err("core path must be absolute".to_string());
+            return Err("path must be absolute".to_string());
         }
         if path
             .components()
             .any(|c| matches!(c, std::path::Component::ParentDir))
         {
-            return Err("core path must not contain '..'".to_string());
+            return Err("path must not contain '..'".to_string());
         }
         Ok(())
     }
@@ -341,6 +370,12 @@ pub mod process {
     }
 
     pub fn set_process_priority(process_name: &str, enable: bool) -> String {
+        if !["BettboxCore.exe", "BettboxDevCore.exe"]
+            .iter()
+            .any(|name| name.eq_ignore_ascii_case(process_name))
+        {
+            return format!("Process {} is not allowed", process_name);
+        }
         use windows::Win32::Foundation::CloseHandle;
         use windows::Win32::System::Diagnostics::ToolHelp::{
             CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,

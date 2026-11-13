@@ -2,7 +2,7 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/views/views.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Navigation {
@@ -15,7 +15,7 @@ class Navigation {
     return [
       NavigationItem(
         keep: false,
-        icon: Icon(Icons.home_rounded),
+        icon: const Icon(Icons.home),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
@@ -38,14 +38,6 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: Icon(Icons.view_timeline_rounded),
-        label: PageLabel.requests,
-        builder: (_) =>
-            RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
-        description: 'requestsDesc',
-        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
-      ),
-      NavigationItem(
         icon: Icon(Icons.cable_rounded),
         label: PageLabel.connections,
         builder: (_) =>
@@ -54,7 +46,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.storage),
+        icon: const Icon(Icons.storage),
         label: PageLabel.resources,
         description: 'resourcesDesc',
         builder: (_) =>
@@ -68,6 +60,14 @@ class Navigation {
         builder: (_) =>
             ScriptsView(key: const GlobalObjectKey(PageLabel.script)),
         modes: [NavigationItemMode.more],
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.handyman_outlined),
+        label: PageLabel.toolbox,
+        description: 'toolboxDesc',
+        builder: (_) =>
+            ToolboxView(key: const GlobalObjectKey(PageLabel.toolbox)),
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
         icon: const Icon(Icons.adb_rounded),
