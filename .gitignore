@@ -86,3 +86,4 @@ app.*.map.json
 /assets/data/zash.zip
 /assets/data/BundleMRS.7z
 /test/private/
+.build-cache/
