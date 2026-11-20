@@ -14,4 +14,24 @@ void main() {
     expect('data:image/png;base64,'.getBase64, isNull);
     expect('data:image/png;base64,@@@'.getBase64, isNull);
   });
+
+  group('isProfileFileName', () {
+    test('接受 yaml / yml 扩展名', () {
+      expect('config.yaml'.isProfileFileName, isTrue);
+      expect('config.yml'.isProfileFileName, isTrue);
+      expect('我的 配置.yml'.isProfileFileName, isTrue);
+    });
+
+    test('扩展名大小写不敏感', () {
+      expect('CONFIG.YAML'.isProfileFileName, isTrue);
+      expect('Config.Yml'.isProfileFileName, isTrue);
+    });
+
+    test('拒绝其他扩展名与伪装文件名', () {
+      expect('config.json'.isProfileFileName, isFalse);
+      expect('config.yaml.txt'.isProfileFileName, isFalse);
+      expect('yaml'.isProfileFileName, isFalse);
+      expect(''.isProfileFileName, isFalse);
+    });
+  });
 }

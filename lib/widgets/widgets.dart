@@ -7,6 +7,7 @@ export 'chip.dart';
 export 'segment_button.dart';
 export 'color_scheme_box.dart';
 export 'disabled_mask.dart';
+export 'drop_profile_area.dart';
 export 'fade_box.dart';
 export 'float_layout.dart';
 export 'editable_grid.dart';

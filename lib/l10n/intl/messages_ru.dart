@@ -754,6 +754,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "Синхронизация с режимом сна Android",
     ),
+    "dropProfileHint": MessageLookupByLibrary.simpleMessage(
+      "Поддерживаются файлы профилей .yaml и .yml",
+    ),
+    "dropProfileTitle": MessageLookupByLibrary.simpleMessage(
+      "Отпустите, чтобы импортировать профиль",
+    ),
+    "dropProfileUnsupported": MessageLookupByLibrary.simpleMessage(
+      "Импортировать можно только профили .yaml / .yml",
+    ),
     "dualRing": MessageLookupByLibrary.simpleMessage("Двойное кольцо"),
     "dynamicColor": MessageLookupByLibrary.simpleMessage("Цвет обоев"),
     "edit": MessageLookupByLibrary.simpleMessage("Редактировать"),

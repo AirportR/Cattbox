@@ -27,6 +27,14 @@ extension StringExtension on String {
     return isRemoteUrl || isLocalUrl;
   }
 
+  /// Whether this string looks like a Clash/Mihomo profile file name.
+  ///
+  /// Matching is case-insensitive so `.YAML` / `.YML` are accepted as well.
+  bool get isProfileFileName {
+    final lower = toLowerCase();
+    return lower.endsWith('.yaml') || lower.endsWith('.yml');
+  }
+
   dynamic get splitByMultipleSeparators {
     final parts = split(
       RegExp(r'[, ;]+'),

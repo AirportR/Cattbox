@@ -618,6 +618,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "OSのDozeスリープモードに同期",
     ),
+    "dropProfileHint": MessageLookupByLibrary.simpleMessage(
+      ".yaml と .yml の設定ファイルに対応しています",
+    ),
+    "dropProfileTitle": MessageLookupByLibrary.simpleMessage("ドロップして設定をインポート"),
+    "dropProfileUnsupported": MessageLookupByLibrary.simpleMessage(
+      ".yaml / .yml の設定ファイルのみインポートできます",
+    ),
     "dualRing": MessageLookupByLibrary.simpleMessage("デュアルリング"),
     "dynamicColor": MessageLookupByLibrary.simpleMessage("動的カラー"),
     "edit": MessageLookupByLibrary.simpleMessage("編集"),

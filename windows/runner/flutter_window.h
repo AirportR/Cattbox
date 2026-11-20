@@ -32,10 +32,20 @@ class FlutterWindow : public Win32Window {
   void RestoreViewWindow();
   void NotifyPaste();
 
+  // OLE drag-and-drop (used by the `file_drop` plugin) is blocked by UIPI when
+  // this process runs elevated, because Explorer lives at a lower integrity
+  // level. The legacy WM_DROPFILES mechanism still works in that case once the
+  // window message filter is widened, so both are kept: OLE drives the hover
+  // overlay, WM_DROPFILES is the fallback that actually delivers elevated drops.
+  void EnableLegacyFileDrop();
+  void HandleDropFiles(WPARAM wparam);
+
   flutter::DartProject project_;
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>
       clipboard_channel_;
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>
+      file_drop_channel_;
   HWND view_window_ = nullptr;
   WNDPROC original_view_proc_ = nullptr;
 };

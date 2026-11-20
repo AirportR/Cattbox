@@ -562,6 +562,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "開啟後同步系統 Doze 休眠模式",
     ),
+    "dropProfileHint": MessageLookupByLibrary.simpleMessage(
+      "支援 .yaml 與 .yml 設定檔",
+    ),
+    "dropProfileTitle": MessageLookupByLibrary.simpleMessage("放開以匯入設定檔"),
+    "dropProfileUnsupported": MessageLookupByLibrary.simpleMessage(
+      "僅支援匯入 .yaml / .yml 設定檔",
+    ),
     "dualRing": MessageLookupByLibrary.simpleMessage("雙環迴旋"),
     "dynamicColor": MessageLookupByLibrary.simpleMessage("莫奈取色"),
     "edit": MessageLookupByLibrary.simpleMessage("編輯"),

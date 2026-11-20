@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   connectivity_plus
   dynamic_color
+  file_drop
   file_selector_windows
   hotkey_manager_windows
   proxy

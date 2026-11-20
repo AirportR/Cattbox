@@ -627,6 +627,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "시스템 Doze 절전 모드와 동기화",
     ),
+    "dropProfileHint": MessageLookupByLibrary.simpleMessage(
+      ".yaml 및 .yml 프로필 파일을 지원합니다",
+    ),
+    "dropProfileTitle": MessageLookupByLibrary.simpleMessage("놓아서 프로필 가져오기"),
+    "dropProfileUnsupported": MessageLookupByLibrary.simpleMessage(
+      ".yaml / .yml 프로필 파일만 가져올 수 있습니다",
+    ),
     "dualRing": MessageLookupByLibrary.simpleMessage("듀얼 링"),
     "dynamicColor": MessageLookupByLibrary.simpleMessage("동적 색상"),
     "edit": MessageLookupByLibrary.simpleMessage("편집"),

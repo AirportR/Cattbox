@@ -13,6 +13,7 @@ dependencies:
   intl: ^0.20.0
   path_provider: ^2.1.6
   path: ^1.9.0
+  file_drop: 1.0.1
   shared_preferences: ^2.5.5
   shared_preferences_platform_interface: ^2.4.2
   window_manager: ^0.5.2

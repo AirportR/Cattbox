@@ -1310,6 +1310,36 @@ class AppLocalizations {
     );
   }
 
+  /// `Drop to import profile`
+  String get dropProfileTitle {
+    return Intl.message(
+      'Drop to import profile',
+      name: 'dropProfileTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only .yaml and .yml profile files are supported`
+  String get dropProfileHint {
+    return Intl.message(
+      'Only .yaml and .yml profile files are supported',
+      name: 'dropProfileHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only .yaml / .yml profile files can be imported`
+  String get dropProfileUnsupported {
+    return Intl.message(
+      'Only .yaml / .yml profile files can be imported',
+      name: 'dropProfileUnsupported',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Name`
   String get name {
     return Intl.message('Name', name: 'name', desc: '', args: []);

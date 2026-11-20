@@ -730,6 +730,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "همگام‌سازی با حالت خواب سیستم (Doze)",
     ),
+    "dropProfileHint": MessageLookupByLibrary.simpleMessage(
+      "فقط فایل‌های پروفایل .yaml و .yml پشتیبانی می‌شوند",
+    ),
+    "dropProfileTitle": MessageLookupByLibrary.simpleMessage(
+      "رها کنید تا پروفایل وارد شود",
+    ),
+    "dropProfileUnsupported": MessageLookupByLibrary.simpleMessage(
+      "فقط فایل‌های پروفایل .yaml / .yml قابل وارد کردن هستند",
+    ),
     "dualRing": MessageLookupByLibrary.simpleMessage("حلقه دوتایی"),
     "dynamicColor": MessageLookupByLibrary.simpleMessage("رنگ پویا"),
     "edit": MessageLookupByLibrary.simpleMessage("ویرایش"),

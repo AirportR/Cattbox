@@ -731,6 +731,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "Sync with system Doze mode",
     ),
+    "dropProfileHint": MessageLookupByLibrary.simpleMessage(
+      "Only .yaml and .yml profile files are supported",
+    ),
+    "dropProfileTitle": MessageLookupByLibrary.simpleMessage(
+      "Drop to import profile",
+    ),
+    "dropProfileUnsupported": MessageLookupByLibrary.simpleMessage(
+      "Only .yaml / .yml profile files can be imported",
+    ),
     "dualRing": MessageLookupByLibrary.simpleMessage("Dual Ring"),
     "dynamicColor": MessageLookupByLibrary.simpleMessage("Dynamic color"),
     "edit": MessageLookupByLibrary.simpleMessage("Edit"),

@@ -1,12 +1,15 @@
 #include "flutter_window.h"
 
+#include <shellapi.h>
 #include <shlobj.h>
 
 #include <cwchar>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "flutter/generated_plugin_registrant.h"
+#include "utils.h"
 
 #ifdef BETTBOX_DEV
 #define BETTBOX_REG_KEY L"Software\\BettboxDev"
@@ -167,7 +170,12 @@ void CleanupLegacyIconSettings() {
 
 constexpr const char kClipboardChannel[] = "clipboard_ext";
 constexpr const char kPasteMethod[] = "paste";
+constexpr const char kFileDropChannel[] = "file_drop_ext";
+constexpr const char kFilesDroppedMethod[] = "onFilesDropped";
 constexpr const wchar_t kFlutterWindowProp[] = L"BettboxFlutterWindow";
+
+// Undocumented but required for drag-and-drop between integrity levels.
+constexpr UINT kMsgCopyGlobalData = 0x0049;
 
 }  // namespace
 
@@ -215,6 +223,59 @@ void FlutterWindow::NotifyPaste() {
   }
 }
 
+void FlutterWindow::EnableLegacyFileDrop() {
+  HWND top_level = GetHandle();
+  HWND view = view_window_;
+  if (top_level == nullptr) {
+    return;
+  }
+  const UINT messages[] = {WM_DROPFILES, WM_COPYDATA, kMsgCopyGlobalData};
+  for (const HWND target : {top_level, view}) {
+    if (target == nullptr) {
+      continue;
+    }
+    for (const UINT message : messages) {
+      ::ChangeWindowMessageFilterEx(target, message, MSGFLT_ALLOW, nullptr);
+    }
+    ::DragAcceptFiles(target, TRUE);
+  }
+}
+
+void FlutterWindow::HandleDropFiles(WPARAM wparam) {
+  const auto drop = reinterpret_cast<HDROP>(wparam);
+  if (drop == nullptr || file_drop_channel_ == nullptr) {
+    if (drop != nullptr) {
+      ::DragFinish(drop);
+    }
+    return;
+  }
+  const UINT count = ::DragQueryFileW(drop, 0xFFFFFFFFU, nullptr, 0U);
+  flutter::EncodableList paths;
+  for (UINT i = 0U; i < count; ++i) {
+    const UINT length = ::DragQueryFileW(drop, i, nullptr, 0U);
+    if (length == 0U) {
+      continue;
+    }
+    std::wstring path(static_cast<size_t>(length) + 1U, L'\0');
+    if (::DragQueryFileW(drop, i, path.data(), length + 1U) == 0U) {
+      continue;
+    }
+    path.resize(static_cast<size_t>(length));
+    std::string utf8 = Utf8FromUtf16(path.c_str());
+    if (utf8.empty()) {
+      continue;
+    }
+    paths.push_back(flutter::EncodableValue(std::move(utf8)));
+  }
+  ::DragFinish(drop);
+  if (paths.empty()) {
+    return;
+  }
+  file_drop_channel_->InvokeMethod(
+      kFilesDroppedMethod,
+      std::make_unique<flutter::EncodableValue>(std::move(paths)));
+}
+
 // static
 LRESULT CALLBACK FlutterWindow::ViewWindowProc(HWND window, UINT message,
                                               WPARAM wparam,
@@ -228,6 +289,10 @@ LRESULT CALLBACK FlutterWindow::ViewWindowProc(HWND window, UINT message,
   WNDPROC original = self->original_view_proc_;
   if (message == WM_PASTE) {
     self->NotifyPaste();
+    return 0;
+  }
+  if (message == WM_DROPFILES) {
+    self->HandleDropFiles(wparam);
     return 0;
   }
   if (message == WM_NCDESTROY) {
@@ -263,6 +328,13 @@ bool FlutterWindow::OnCreate() {
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
   SubclassViewWindow();
 
+  file_drop_channel_ =
+      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+          flutter_controller_->engine()->messenger(), kFileDropChannel,
+          &flutter::StandardMethodCodec::GetInstance());
+
+  EnableLegacyFileDrop();
+
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
 
   });
@@ -275,6 +347,7 @@ bool FlutterWindow::OnCreate() {
 void FlutterWindow::OnDestroy() {
   RestoreViewWindow();
   clipboard_channel_ = nullptr;
+  file_drop_channel_ = nullptr;
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }
@@ -301,6 +374,9 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
       break;
     case WM_PASTE:
       NotifyPaste();
+      return 0;
+    case WM_DROPFILES:
+      HandleDropFiles(wparam);
       return 0;
   }
 

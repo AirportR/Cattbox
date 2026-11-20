@@ -11,6 +11,7 @@ import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -394,16 +395,20 @@ class ApplicationState extends ConsumerState<Application>
               builder: (_, child) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: globalState.animationEnabled,
-                    builder: (_, enabled, _) {
-                      return TickerMode(
-                        enabled: enabled,
-                        child: _buildApp(
-                          AppSidebarContainer(child: _buildPlatformApp(child!)),
-                        ),
-                      );
-                    },
+                  child: DropProfileArea(
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: globalState.animationEnabled,
+                      builder: (_, enabled, _) {
+                        return TickerMode(
+                          enabled: enabled,
+                          child: _buildApp(
+                            AppSidebarContainer(
+                              child: _buildPlatformApp(child!),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 );
               },
