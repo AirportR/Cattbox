@@ -89,6 +89,7 @@ abstract class Profile with _$Profile {
     @Default(false) bool managed,
     @Default(false) bool managedStyleApplied,
     String? ageSecretKey,
+    String? userAgent,
     @JsonKey(name: 'group-switches')
     @Default({})
     Map<String, bool> groupSwitches,
@@ -340,7 +341,11 @@ extension ProfileExtension on Profile {
     );
     try {
       await File(downloadPath).parent.create(recursive: true);
-      final source = await request.fetchProfileSource(url, downloadPath);
+      final source = await request.fetchProfileSource(
+        url,
+        downloadPath,
+        userAgent: userAgent,
+      );
       final headers = source.headers;
       final disposition = headers?['content-disposition']?.firstOrNull;
       final userinfo = headers?['subscription-userinfo']?.firstOrNull;
@@ -354,6 +359,12 @@ extension ProfileExtension on Profile {
         validate: validate,
         encodings: source.remote ? encodings : null,
       );
+      final customUa = userAgent?.trim();
+      if (customUa != null && customUa.isNotEmpty) {
+        try {
+          await ToolHistoryStore.instance.add(userAgentHistoryKey, customUa);
+        } catch (_) {}
+      }
       return profile.copyWith(lastUpdateDate: DateTime.now());
     } finally {
       await _deleteStaging(downloadPath);

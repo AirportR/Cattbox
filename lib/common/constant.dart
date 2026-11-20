@@ -14,6 +14,7 @@ const coreName = 'clash.meta';
 const tunDeviceName = AppIdentity.tunDeviceName;
 const browserUa =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36';
+const userAgentHistoryKey = 'userAgent';
 const packageName = AppIdentity.packageId;
 final unixSocketPath = '/tmp/BettboxSocket_${Random().nextInt(10000)}.sock';
 const maxTextScale = 1.4;
