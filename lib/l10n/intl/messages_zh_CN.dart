@@ -1300,6 +1300,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "请输入配置 URL",
     ),
+    "profileUserAgent": MessageLookupByLibrary.simpleMessage("自定义 UA（可选）"),
+    "profileUserAgentHint": MessageLookupByLibrary.simpleMessage("留空使用全局 UA"),
+    "profileUserAgentHistory": MessageLookupByLibrary.simpleMessage("历史 UA"),
+    "profileUserAgentInvalidDesc": MessageLookupByLibrary.simpleMessage(
+      "UA 不能包含换行或控制字符",
+    ),
     "profiles": MessageLookupByLibrary.simpleMessage("配置"),
     "profilesSort": MessageLookupByLibrary.simpleMessage("配置排序"),
     "progress": MessageLookupByLibrary.simpleMessage("进程"),

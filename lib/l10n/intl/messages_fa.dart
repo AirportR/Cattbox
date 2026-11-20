@@ -1742,6 +1742,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "لطفاً آدرس URL را وارد کنید",
     ),
+    "profileUserAgent": MessageLookupByLibrary.simpleMessage(
+      "UA سفارشی (اختیاری)",
+    ),
+    "profileUserAgentHint": MessageLookupByLibrary.simpleMessage(
+      "برای استفاده از UA سراسری خالی بگذارید",
+    ),
+    "profileUserAgentHistory": MessageLookupByLibrary.simpleMessage(
+      "تاریخچه UA",
+    ),
+    "profileUserAgentInvalidDesc": MessageLookupByLibrary.simpleMessage(
+      "UA نباید شامل خط جدید یا کاراکترهای کنترلی باشد",
+    ),
     "profiles": MessageLookupByLibrary.simpleMessage("پروفایل‌ها"),
     "profilesSort": MessageLookupByLibrary.simpleMessage(
       "مرتب‌سازی پروفایل‌ها",

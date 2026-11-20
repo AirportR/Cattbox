@@ -1800,6 +1800,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "Введите URL профиля",
     ),
+    "profileUserAgent": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский UA (необязательно)",
+    ),
+    "profileUserAgentHint": MessageLookupByLibrary.simpleMessage(
+      "Оставьте пустым, чтобы использовать глобальный UA",
+    ),
+    "profileUserAgentHistory": MessageLookupByLibrary.simpleMessage(
+      "История UA",
+    ),
+    "profileUserAgentInvalidDesc": MessageLookupByLibrary.simpleMessage(
+      "UA не может содержать переводы строк или управляющие символы",
+    ),
     "profiles": MessageLookupByLibrary.simpleMessage("Профили"),
     "profilesSort": MessageLookupByLibrary.simpleMessage("Сортировка профилей"),
     "progress": MessageLookupByLibrary.simpleMessage("Процесс"),

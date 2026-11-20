@@ -14,6 +14,7 @@ void main() {
   late Directory home;
   late String url;
   final acceptEncodings = <String>[];
+  final userAgents = <String>[];
   var duplicateEncoding = true;
 
   void serve(Socket socket) {
@@ -33,6 +34,14 @@ void main() {
           ).firstMatch(head)?.group(1)?.trim() ??
           '';
       acceptEncodings.add(acceptEncoding);
+      final userAgent =
+          RegExp(
+            r'^user-agent:\s*([^\r\n]*)',
+            caseSensitive: false,
+            multiLine: true,
+          ).firstMatch(head)?.group(1)?.trim() ??
+          '';
+      userAgents.add(userAgent);
       final gzipped = acceptEncoding.contains('gzip');
       final body = gzipped
           ? gzip.encode(utf8.encode(_content))
@@ -80,6 +89,7 @@ void main() {
 
   setUp(() {
     acceptEncodings.clear();
+    userAgents.clear();
     duplicateEncoding = true;
   });
 
@@ -90,6 +100,23 @@ void main() {
     expect(acceptEncodings, ['gzip', 'identity']);
     expect(source.headers?['content-encoding'], ['identity']);
     expect(await File(path).readAsString(), _content);
+  });
+
+  test('自定义 UA 覆盖订阅下载的默认 UA', () async {
+    final path = '${home.path}/profile.custom-ua.download';
+    const customUa = 'CattboxTest/1.0';
+    await request.fetchProfileSource(url, path, userAgent: customUa);
+
+    expect(userAgents, hasLength(2));
+    expect(userAgents, everyElement(equals(customUa)));
+  });
+
+  test('未指定 UA 时使用全局 UA', () async {
+    final path = '${home.path}/profile.default-ua.download';
+    await request.fetchProfileSource(url, path);
+
+    expect(userAgents, hasLength(2));
+    expect(userAgents, everyElement(equals(globalState.ua)));
   });
 
   test('content-encoding 多值时文本请求改用 identity 重试', () async {

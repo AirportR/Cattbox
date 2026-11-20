@@ -1451,6 +1451,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "프로필 URL을 입력하세요",
     ),
+    "profileUserAgent": MessageLookupByLibrary.simpleMessage("사용자 지정 UA(선택)"),
+    "profileUserAgentHint": MessageLookupByLibrary.simpleMessage(
+      "비워 두면 전역 UA 사용",
+    ),
+    "profileUserAgentHistory": MessageLookupByLibrary.simpleMessage("UA 기록"),
+    "profileUserAgentInvalidDesc": MessageLookupByLibrary.simpleMessage(
+      "UA에는 줄바꿈이나 제어 문자를 사용할 수 없습니다",
+    ),
     "profiles": MessageLookupByLibrary.simpleMessage("프로필"),
     "profilesSort": MessageLookupByLibrary.simpleMessage("프로필 정렬"),
     "progress": MessageLookupByLibrary.simpleMessage("프로세스"),

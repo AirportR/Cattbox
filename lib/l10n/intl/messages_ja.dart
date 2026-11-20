@@ -1446,6 +1446,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "設定URLを入力してください",
     ),
+    "profileUserAgent": MessageLookupByLibrary.simpleMessage("カスタム UA（任意）"),
+    "profileUserAgentHint": MessageLookupByLibrary.simpleMessage(
+      "空欄の場合はグローバル UA を使用",
+    ),
+    "profileUserAgentHistory": MessageLookupByLibrary.simpleMessage("UA 履歴"),
+    "profileUserAgentInvalidDesc": MessageLookupByLibrary.simpleMessage(
+      "UA に改行や制御文字は使用できません",
+    ),
     "profiles": MessageLookupByLibrary.simpleMessage("サブスク"),
     "profilesSort": MessageLookupByLibrary.simpleMessage("プロファイル並び替え"),
     "progress": MessageLookupByLibrary.simpleMessage("プロセス"),

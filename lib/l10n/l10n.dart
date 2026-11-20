@@ -1255,6 +1255,46 @@ class AppLocalizations {
     );
   }
 
+  /// `Custom UA (optional)`
+  String get profileUserAgent {
+    return Intl.message(
+      'Custom UA (optional)',
+      name: 'profileUserAgent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Leave empty to use the global UA`
+  String get profileUserAgentHint {
+    return Intl.message(
+      'Leave empty to use the global UA',
+      name: 'profileUserAgentHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UA history`
+  String get profileUserAgentHistory {
+    return Intl.message(
+      'UA history',
+      name: 'profileUserAgentHistory',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UA cannot contain line breaks or control characters`
+  String get profileUserAgentInvalidDesc {
+    return Intl.message(
+      'UA cannot contain line breaks or control characters',
+      name: 'profileUserAgentInvalidDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `File`
   String get file {
     return Intl.message('File', name: 'file', desc: '', args: []);

@@ -1721,6 +1721,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "Please enter a profile URL",
     ),
+    "profileUserAgent": MessageLookupByLibrary.simpleMessage(
+      "Custom UA (optional)",
+    ),
+    "profileUserAgentHint": MessageLookupByLibrary.simpleMessage(
+      "Leave empty to use the global UA",
+    ),
+    "profileUserAgentHistory": MessageLookupByLibrary.simpleMessage(
+      "UA history",
+    ),
+    "profileUserAgentInvalidDesc": MessageLookupByLibrary.simpleMessage(
+      "UA cannot contain line breaks or control characters",
+    ),
     "profiles": MessageLookupByLibrary.simpleMessage("Profiles"),
     "profilesSort": MessageLookupByLibrary.simpleMessage("Profile Sorting"),
     "progress": MessageLookupByLibrary.simpleMessage("Progress"),
