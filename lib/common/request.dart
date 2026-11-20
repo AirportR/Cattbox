@@ -254,8 +254,9 @@ class Request {
 
   Future<({String path, Headers? headers, bool remote})> fetchProfileSource(
     String url,
-    String downloadPath,
-  ) async {
+    String downloadPath, {
+    String? userAgent,
+  }) async {
     if (url.isFileUrl) {
       final local = await _localFileForUrl(url);
       await local.file.copy(downloadPath);
@@ -266,6 +267,10 @@ class Request {
       );
     }
     final (requestUrl, headers) = _authorizedRequest(url);
+    final customUa = userAgent?.trim();
+    if (customUa != null && customUa.isNotEmpty) {
+      headers[HttpHeaders.userAgentHeader] = customUa;
+    }
     final response = await _withPlainEncodingRetry(
       headers,
       (requestHeaders) => _clashDio.download(
