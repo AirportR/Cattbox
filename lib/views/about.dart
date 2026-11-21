@@ -27,9 +27,11 @@ class AboutView extends StatelessWidget {
       title: appLocalizations.checkUpdate,
       needLoading: true,
     );
-    globalState.appController.checkUpdateResultHandle(
-      data: data,
-      handleError: true,
+    unawaited(
+      globalState.appController.checkUpdateResultHandle(
+        data: data,
+        handleError: true,
+      ),
     );
   }
 
@@ -208,6 +210,9 @@ class AboutView extends StatelessWidget {
                           'assets/images/icon.png',
                           width: 48,
                           height: 48,
+                          cacheWidth: 48,
+                          cacheHeight: 48,
+                          useLogicalCacheSize: true,
                         ),
                       ),
                       Column(
@@ -459,10 +464,10 @@ class _LinkTile extends StatelessWidget {
                     color: colorScheme.primary.opacity12,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, size: 19, color: colorScheme.primary),
+                  child: AppIcon(icon, size: 19, color: colorScheme.primary),
                 ),
                 const Spacer(),
-                Icon(
+                AppIcon(
                   external ? Icons.arrow_outward : Icons.arrow_forward,
                   size: 16,
                   color: colorScheme.onSurfaceVariant.opacity50,

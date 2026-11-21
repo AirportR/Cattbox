@@ -129,6 +129,27 @@ func closeIdleOutbounds(proxies map[string]cProxy.Proxy, providers map[string]cp
 	}
 }
 
+func closeStaleWireGuards(proxies map[string]cProxy.Proxy, providers map[string]cp.ProxyProvider) {
+	current := tunnel.Proxies()
+	for name, p := range proxies {
+		if current[name] != p {
+			closeStaleWireGuard(p)
+		}
+	}
+	for _, pr := range providers {
+		for _, p := range pr.Proxies() {
+			closeStaleWireGuard(p)
+		}
+	}
+}
+
+func closeStaleWireGuard(p cProxy.Proxy) {
+	if p.Type() != cProxy.WireGuard {
+		return
+	}
+	_ = p.Adapter().Close()
+}
+
 // idleCloser mirrors the CloseIdle hook the upstream core expects from its
 // vendored mihomo tree. Declaring it locally keeps the interface assertion
 // working without requiring the submodule to export the same type, so the
