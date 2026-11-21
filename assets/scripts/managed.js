@@ -4,7 +4,7 @@
  * 自定义分流远程规则集：@appshubcc https://github.com/appshubcc/bett-rules 
  */
 
-// @version 2026112003
+// @version 2026112104
 const Compatible_With_Bettbox = { ruleOptionsEnable: true };
 
 const ruleOptionsEnable = {
